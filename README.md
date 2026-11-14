@@ -20,6 +20,14 @@ npm run pack
 
 That produces `dist/mac-arm64/local-note.app`. Copy it to `/Applications` and use it like any other Mac app.
 
+Builds are **unsigned** by default. To sign with your own Developer ID, pass the certificate name:
+
+```bash
+CSC_NAME="Your Name (TEAMID)" npm run pack
+```
+
+To re-bake the icon, run `npm run icon` (see `build/icon-source/README.md`).
+
 ## Editing
 
 The editor follows Notion's behaviour closely.
@@ -141,3 +149,11 @@ local-note/
 ```
 
 Security settings: `contextIsolation: true`, `nodeIntegration: false`, CSP enabled. No code in this app reaches the network.
+
+## License
+
+MIT (see `LICENSE`).
+
+The icon is set in **UnifrakturCook Bold** by j. 'mach' wust, based on work by Peter Wiegel,
+licensed under the SIL Open Font License 1.1 and bundled in `build/icon-source/fonts/`.
+The font is used only to generate the icon and is not shipped inside the app.

@@ -18,6 +18,14 @@ npm run pack
 
 `dist/mac-arm64/local-note.app` ができます。`/Applications` にコピーすればふつうのMacアプリとして常用できます。
 
+既定では**署名なし**でビルドします。自分の Developer ID で署名するときは、証明書の名前を環境変数で渡してください。
+
+```bash
+CSC_NAME="あなたの名前 (TEAMID)" npm run pack
+```
+
+アイコンを焼き直すときは `npm run icon`（詳しくは `build/icon-source/README.md`）。
+
 ## 画面と操作感
 
 Notion のエディタ挙動に寄せてあります。
@@ -139,3 +147,10 @@ local-note/
 ```
 
 セキュリティ設定は `contextIsolation: true` / `nodeIntegration: false` / CSP あり。ネットワークへ出るコードはありません。
+
+## ライセンス
+
+MIT License です（`LICENSE`）。
+
+アイコンの生成に使っている書体 **UnifrakturCook Bold**（j. 'mach' wust 作、Peter Wiegel の作に基づく）は
+SIL Open Font License 1.1 で、`build/icon-source/fonts/` に同梱しています。アプリ本体には含まれません。

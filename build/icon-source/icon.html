@@ -1,8 +1,9 @@
 <!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}canvas{display:block}</style></head>
 <body><canvas id="c" width="1024" height="1024"></canvas>
 <script>
-// Death Note の L と同じ系統の書体（iMovie 同梱の Old English Text）で L を描く
-const FONT = 'file:///Applications/iMovie.app/Contents/Frameworks/Flexo.framework/Versions/A/Resources/Fonts/OldEnglishText-Regular.ttf';
+// ブラックレターの L。書体はリポジトリに同梱した UnifrakturCook Bold（SIL OFL 1.1）。
+// 外部のフォントに依存しないので、誰の環境でも同じアイコンを焼き直せる。
+const FONT = 'fonts/UnifrakturCook-Bold.ttf';
 const LETTER = 'L';
 const S = 1024, ctx = document.getElementById('c').getContext('2d');
 
@@ -16,7 +17,7 @@ function roundRect(x, y, w, h, r) {
   // ?small … 16〜32px用（字を大きく・内側の縁なし） / ?mark … タイル無し・透過
   const small = location.search.includes('small');
   const markOnly = location.search.includes('mark');
-  const f = new FontFace('OldEng', `url("${FONT}")`);
+  const f = new FontFace('Blackletter', `url("${FONT}")`);
   await f.load(); document.fonts.add(f); await document.fonts.ready;
 
   const M = markOnly ? 60 : 100, B = S - M * 2, R = 185;
@@ -33,8 +34,8 @@ function roundRect(x, y, w, h, r) {
   }
 
   // 字を実寸で測って中心に置く
-  const FS = markOnly ? 760 : (small ? 620 : 540);
-  ctx.font = `${FS}px OldEng`;
+  const FS = markOnly ? 980 : (small ? 820 : 700);
+  ctx.font = `${FS}px Blackletter`;
   ctx.textBaseline = 'alphabetic';
   const m = ctx.measureText(LETTER);
   const left = -m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight;

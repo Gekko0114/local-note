@@ -523,6 +523,30 @@ function buildMenu() {
 /* ------------------------------------------------------------------ */
 /* ウィンドウ                                                          */
 /* ------------------------------------------------------------------ */
+// このアプリ自身のページ以外へは絶対に遷移させない。
+// （preload はそのウィンドウの全ページに効くので、メモに書かれた file:// リンクを
+//   踏んだだけで、遷移先のHTMLに保存APIを渡してしまうのを防ぐ）
+const OWN_PAGES = ['index.html', 'setup.html'].map((n) =>
+  pathToFileURL(path.join(__dirname, 'renderer', n)).toString());
+
+function hardenNavigation(wc) {
+  // 新しいウィンドウは開かせず、http(s) だけ既定のブラウザへ逃がす
+  wc.setWindowOpenHandler(({ url }) => {
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  const guard = (e, url) => {
+    const base = String(url).split(/[?#]/)[0];
+    if (OWN_PAGES.includes(base)) return;   // 自分のページの再読み込みだけ許可
+    e.preventDefault();
+    if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+  };
+  wc.on('will-navigate', guard);
+  wc.on('will-frame-navigate', (e) => guard(e, e.url));
+  wc.on('will-redirect', guard);
+  wc.on('will-attach-webview', (e) => e.preventDefault());
+}
+
 function createSetupWindow() {
   setupWin = new BrowserWindow({
     width: 620,
@@ -539,6 +563,7 @@ function createSetupWindow() {
     },
   });
   setupWin.loadFile(path.join(__dirname, 'renderer', 'setup.html'));
+  hardenNavigation(setupWin.webContents);
   setupWin.webContents.on('console-message', (_e, level, message, line, source) => {
     if (level >= 2) console.error(`[setup] ${message} (${String(source).split('/').pop()}:${line})`);
     else if (/ready/i.test(message)) console.log(`[setup] ${message}`);
@@ -573,14 +598,7 @@ function createWindow() {
   win.webContents.on('render-process-gone', (_e, details) => console.error('[renderer] crashed:', details.reason));
   win.on('closed', () => { win = null; });
 
-  // 外部リンクは既定のブラウザで開く
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (/^https?:/.test(url)) shell.openExternal(url);
-    return { action: 'deny' };
-  });
-  win.webContents.on('will-navigate', (e, url) => {
-    if (!url.startsWith('file://')) { e.preventDefault(); if (/^https?:/.test(url)) shell.openExternal(url); }
-  });
+  hardenNavigation(win.webContents);
 }
 
 protocol.registerSchemesAsPrivileged([

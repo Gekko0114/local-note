@@ -5,45 +5,27 @@
   "description": "ローカルPCだけで動く、Notion風のデスクトップノートアプリ",
   "main": "main.js",
   "private": true,
+  "license": "MIT",
+  "author": "Gekko0114",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gekko0114/local-note.git"
+  },
+  "homepage": "https://github.com/Gekko0114/local-note#readme",
+  "bugs": {
+    "url": "https://github.com/Gekko0114/local-note/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "pack": "electron-builder --dir --arm64",
+    "dist": "electron-builder",
+    "icon": "node build/icon-source/make-icon.mjs"
   },
   "devDependencies": {
-    "electron": "33.2.1",
-    "electron-builder": "25.1.8"
-  },
-  "build": {
-    "appId": "net.trends-ai.local-note",
-    "productName": "local-note",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "main.js",
-      "preload.js",
-      "renderer/**/*",
-      "package.json",
-      "!build/icon.iconset"
-    ],
-    "mac": {
-      "category": "public.app-category.productivity",
-      "target": [
-        {
-          "target": "dir",
-          "arch": [
-            "arm64"
-          ]
-        }
-      ],
-      "icon": "build/icon.icns",
-      "extendInfo": {
-        "NSDocumentsFolderUsageDescription": "メモの保存先フォルダを読み書きするために使います。",
-        "NSDesktopFolderUsageDescription": "メモの保存先にデスクトップ配下を選んだ場合に、その読み書きのために使います。",
-        "NSDownloadsFolderUsageDescription": "メモの保存先にダウンロード配下を選んだ場合に、その読み書きのために使います。",
-        "NSRemovableVolumesUsageDescription": "メモの保存先に外付けドライブを選んだ場合に、その読み書きのために使います。"
-      }
-    }
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
   }
 }

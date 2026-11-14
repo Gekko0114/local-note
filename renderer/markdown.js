@@ -37,13 +37,29 @@ window.MD = (() => {
   };
 
   /* ---------------- inline: Markdown -> HTML ---------------- */
-  const escHtml = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // メモは他人からもらったファイルかもしれないので、URLは出所を見てから属性に入れる。
+  // （mdToHtml は先頭で全体を escHtml 済みなので、ここでは再エスケープしない）
+  // 許すのは http(s) / mailto / 画像用の lnfile・data:image / 同じフォルダ内の相対パスだけ。
+  const safeUrl = (raw) => {
+    const url = String(raw || '').trim();
+    if (!url) return '';
+    if (/^(https?:|mailto:|lnfile:)/i.test(url)) return url;
+    if (/^data:image\/(png|jpe?g|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=\s]*$/i.test(url)) return url;
+    if (/^[^:/?#]+\.md$/i.test(url)) return url;            // 隣のページへの相対リンク
+    return '';                                              // javascript: や file: はここで落ちる
+  };
 
   function mdToHtml(src, pageIndex) {
     const codes = [];
     let s = escHtml(src || '').replace(/`([^`]+)`/g, (_m, c) => { codes.push(c); return `\u0000C${codes.length - 1}\u0000`; });
 
-    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, alt, url) => `<img src="${url}" alt="${alt}">`);
+    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, alt, url) => {
+      const src = safeUrl(url);
+      return src ? `<img src="${src}" alt="${alt}">` : (alt || url);
+    });
 
     s = s.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_m, target, label) => {
       const key = target.trim().toLowerCase();
@@ -54,8 +70,15 @@ window.MD = (() => {
         : `<a class="wiki missing" data-new="${escHtml(target.trim())}" data-title="${escHtml(target.trim())}">${text}</a>`;
     });
 
-    s = s.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, text, url) => `<a href="${url}">${text || url}</a>`);
-    s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (_m, pre, url) => `${pre}<a href="${url}">${url}</a>`);
+    s = s.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (_m, text, url) => {
+      const href = safeUrl(url);
+      const label = text || url;
+      return href ? `<a href="${href}">${label}</a>` : label;
+    });
+    s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (_m, pre, url) => {
+      const href = safeUrl(url);
+      return href ? `${pre}<a href="${href}">${url}</a>` : `${pre}${url}`;
+    });
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
          .replace(/(^|[^\w*])\*([^*\n]+)\*/g, '$1<em>$2</em>')
          .replace(/~~([^~]+)~~/g, '<del>$1</del>')
