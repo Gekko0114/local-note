@@ -1,0 +1,43 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}canvas{display:block}</style></head>
+<body><canvas id="c" width="1024" height="1024"></canvas>
+<script>
+const FONT = 'file:///Applications/iMovie.app/Contents/Frameworks/Flexo.framework/Versions/A/Resources/Fonts/OldEnglishText-Regular.ttf';
+const S = 1024, ctx = document.getElementById('c').getContext('2d');
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+(async () => {
+  const small = location.search.includes('small');
+  const markOnly = location.search.includes('mark');
+  const f = new FontFace('OldEng', `url("${FONT}")`);
+  await f.load(); document.fonts.add(f); await document.fonts.ready;
+
+  // ---- 背景（macOS風の角丸タイル）----
+  const M = markOnly ? 40 : 100, B = S - M * 2, R = 185;
+  const g = ctx.createLinearGradient(M, M, M, M + B);
+  if (small) { g.addColorStop(0, '#111111'); g.addColorStop(1, '#000000'); }
+  else { g.addColorStop(0, '#272727'); g.addColorStop(0.5, '#101010'); g.addColorStop(1, '#000000'); }
+  if (!markOnly) { roundRect(M, M, B, B, R); ctx.fillStyle = g; ctx.fill(); }
+  if (!small && !markOnly) {
+    roundRect(M + 2.5, M + 2.5, B - 5, B - 5, R - 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 4; ctx.stroke();
+  }
+
+  // ---- L を実寸で測って、タイルの中心に合わせる ----
+  const FS = markOnly ? 820 : (small ? 700 : 560);
+  ctx.font = `${FS}px OldEng`;
+  ctx.textBaseline = 'alphabetic';
+  const m = ctx.measureText('L');
+  const left = -m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight;
+  const top = -m.actualBoundingBoxAscent, bottom = m.actualBoundingBoxDescent;
+  const w = right - left, h = bottom - top;
+  const cx = M + B / 2, cy = M + B / 2;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('L', cx - (left + w / 2), cy - (top + h / 2) - 6);
+  console.log('glyph box', JSON.stringify({ w: Math.round(w), h: Math.round(h) }));
+})();
+</script></body></html>

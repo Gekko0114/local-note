@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' lnfile:; img-src 'self' lnfile: data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>local-note</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <aside id="sidebar">
+    <div class="ws">
+      <div class="ws-icon"><img src="l-mark.png" alt="" draggable="false"></div>
+      <div class="ws-name">local-note</div>
+      <button class="icon-btn" id="toggle-sidebar" title="サイドバーを隠す (⌘\)">«</button>
+    </div>
+
+    <div class="side-scroll">
+      <div class="side-group">
+        <div class="row" id="side-search"><span class="row-icon">🔍</span><span class="row-title">検索</span></div>
+        <div class="row" id="side-new"><span class="row-icon">✏️</span><span class="row-title">新規ページ</span></div>
+      </div>
+
+      <div class="side-group" id="fav-group" hidden>
+        <div class="side-label">お気に入り</div>
+        <div class="tree" id="fav-tree"></div>
+      </div>
+
+      <div class="side-group">
+        <div class="side-label">プライベート <button id="add-root" title="ページを追加">＋</button></div>
+        <div class="tree" id="tree"></div>
+      </div>
+    </div>
+
+    <div class="side-foot">
+      <div class="row" id="side-trash"><span class="row-icon">🗑</span><span class="row-title">ゴミ箱</span><span id="trash-count" class="row-actions" style="opacity:1"></span></div>
+      <div class="row" id="side-data"><span class="row-icon">📁</span><span class="row-title">データフォルダを開く</span></div>
+      <div class="side-note" id="data-path"></div>
+    </div>
+
+    <div class="sidebar-resizer"></div>
+  </aside>
+
+  <main id="main">
+    <header id="topbar">
+      <div class="topbar-pad"></div>
+      <div class="crumbs" id="crumbs"></div>
+      <span id="save-state" style="font-size:12px;color:var(--text-3);margin-right:6px"></span>
+      <button class="icon-btn star" id="star" title="お気に入り">☆</button>
+      <button class="icon-btn" id="more" title="メニュー">⋯</button>
+    </header>
+
+    <div id="scroller">
+      <section id="page-view" class="page">
+        <div class="page-top">
+          <button class="page-icon-btn" id="page-icon" hidden></button>
+          <div class="page-tools">
+            <button id="btn-add-icon">🙂 アイコンを追加</button>
+            <button id="btn-add-tag">🏷 タグを追加</button>
+          </div>
+          <div id="title" contenteditable="true" data-placeholder="無題" spellcheck="false"></div>
+          <div class="page-tags" id="tags"></div>
+        </div>
+        <div id="blocks"></div>
+      </section>
+
+      <section id="trash-view" class="list-view" hidden>
+        <h2>🗑 ゴミ箱</h2>
+        <p class="note">復元するか、完全に削除できます。完全削除は Markdown ファイルごと消えるので取り消せません。</p>
+        <div id="trash-list"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="search-modal" hidden>
+  <div class="modal">
+    <input id="search-input" placeholder="ページを検索 / 作成…" spellcheck="false" autocomplete="off">
+    <div class="results" id="search-results"></div>
+    <div class="foot">↑↓ で選択 · ⏎ で開く · esc で閉じる</div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="dev-mock.js"></script>
+<script src="markdown.js"></script>
+<script src="editor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

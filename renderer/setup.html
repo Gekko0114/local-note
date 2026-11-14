@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>local-note へようこそ</title>
+<style>
+  :root {
+    --text: rgb(55, 53, 47);
+    --text-dim: rgba(55, 53, 47, 0.65);
+    --text-faint: rgba(55, 53, 47, 0.45);
+    --bg: #ffffff;
+    --card: #f7f7f5;
+    --line: rgba(55, 53, 47, 0.12);
+    --blue: #2383e2;
+    --blue-hover: #1a6fc4;
+    --red: #e03e3e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: rgba(255, 255, 255, 0.9);
+      --text-dim: rgba(255, 255, 255, 0.6);
+      --text-faint: rgba(255, 255, 255, 0.4);
+      --bg: #191919;
+      --card: #202020;
+      --line: rgba(255, 255, 255, 0.13);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .drag { height: 38px; flex: none; -webkit-app-region: drag; }
+  main { flex: 1; padding: 4px 48px 0; display: flex; flex-direction: column; }
+  .spacer { flex: 1; min-height: 8px; }
+  .wave { width: 56px; height: 56px; margin-bottom: 16px; display: block; border-radius: 12px; }
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 10px; }
+  p.lead { color: var(--text-dim); margin: 0 0 22px; }
+  .label { font-size: 12px; font-weight: 600; color: var(--text-faint); letter-spacing: 0.03em; margin-bottom: 7px; }
+  .pathbox {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 11px 11px 11px 13px;
+  }
+  .pathbox .p {
+    flex: 1; min-width: 0; font-size: 13.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    -webkit-user-select: text; user-select: text;
+  }
+  button { font: inherit; cursor: pointer; border-radius: 5px; transition: background 90ms ease; }
+  .ghost {
+    flex: none; background: transparent; color: var(--text-dim);
+    border: 1px solid var(--line); padding: 5px 11px; font-size: 13px;
+  }
+  .ghost:hover { background: rgba(55, 53, 47, 0.06); color: var(--text); }
+  @media (prefers-color-scheme: dark) { .ghost:hover { background: rgba(255, 255, 255, 0.08); } }
+  .note { margin: 11px 2px 0; font-size: 13px; color: var(--text-faint); min-height: 22px; }
+  .note.found { color: var(--blue); }
+  .note.err { color: var(--red); }
+  footer {
+    flex: none; margin-top: auto; padding: 18px 48px 26px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .hint { flex: 1; font-size: 12.5px; color: var(--text-faint); }
+  .primary {
+    flex: none; background: var(--blue); color: #fff; border: none;
+    padding: 9px 20px; font-size: 14px; font-weight: 500;
+  }
+  .primary:hover { background: var(--blue-hover); }
+  .primary:disabled { opacity: 0.5; cursor: default; }
+</style>
+</head>
+<body>
+  <div class="drag"></div>
+  <main>
+    <img class="wave" src="app-icon.png" alt="" draggable="false">
+    <h1>local-note へようこそ</h1>
+    <p class="lead">メモは「1ページ＝1つの Markdown ファイル」として、あなたが選んだフォルダに保存されます。クラウドには何も送信しません。</p>
+
+    <div class="label">保存先フォルダ</div>
+    <div class="pathbox">
+      <div class="p" id="path">…</div>
+      <button class="ghost" id="choose">変更…</button>
+    </div>
+    <div class="note" id="note"></div>
+    <div class="spacer"></div>
+  </main>
+  <footer>
+    <div class="hint">保存先はあとから変更できます。</div>
+    <button class="primary" id="start">このフォルダで始める</button>
+  </footer>
+  <script src="setup.js"></script>
+</body>
+</html>
