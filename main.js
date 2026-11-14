@@ -34,7 +34,14 @@ function dataDir() {
 const pagesDir = () => path.join(dataDir(), 'pages');
 const filesDir = () => path.join(dataDir(), 'files');
 
-const defaultDataDir = () => path.join(app.getPath('documents'), 'local-note');
+// 書類・デスクトップ・ダウンロードは macOS の保護対象（許可がないと読めない）なので、
+// 既定の保存先はホーム直下にする
+const defaultDataDir = () => path.join(app.getPath('home'), 'local-note');
+const legacyDataDirs = () => [
+  path.join(app.getPath('documents'), 'local-note'),
+  path.join(app.getPath('documents'), 'local-notion'),
+  path.join(app.getPath('home'), 'local-notion'),
+];
 
 // そのフォルダに既にメモが何件あるか（pages/*.md の数）
 function countPages(dir) {
@@ -53,7 +60,7 @@ function needsSetup() {
   return true;
 }
 
-// 旧名（local-notion）からの引き継ぎ：設定とデータフォルダを一度だけ移す
+// 旧い保存先（local-notion、書類フォルダの下）からの引き継ぎを一度だけ行う
 function migrateFromOldName() {
   const supportDir = path.dirname(app.getPath('userData'));
   const oldSettings = path.join(supportDir, 'local-notion', 'settings.json');
@@ -64,9 +71,10 @@ function migrateFromOldName() {
     } catch (err) { console.error('[main] 旧設定の引き継ぎに失敗:', err); }
   }
   if (readSettings().dataDir) return; // 保存先を自分で指定しているときは触らない
-  const prev = path.join(app.getPath('documents'), 'local-notion');
   const next = defaultDataDir();
-  if (fs.existsSync(prev) && !fs.existsSync(next)) {
+  if (fs.existsSync(next)) return;
+  for (const prev of legacyDataDirs()) {
+    if (!fs.existsSync(prev)) continue;
     try {
       fs.renameSync(prev, next);
       console.log('[main] データフォルダを移しました:', prev, '->', next);
@@ -75,7 +83,62 @@ function migrateFromOldName() {
       console.error('[main] データフォルダの移動に失敗、旧フォルダを使います:', err);
       try { writeSettings({ dataDir: prev }); } catch {}
     }
+    return;
   }
+}
+
+// 保存先が読み書きできるか。できなければエラーを返す
+function dataDirAccessError() {
+  try {
+    fs.mkdirSync(pagesDir(), { recursive: true });
+    fs.mkdirSync(filesDir(), { recursive: true });
+    fs.readdirSync(pagesDir());
+    return null;
+  } catch (err) {
+    return err;
+  }
+}
+
+const isPermissionError = (err) => err && (err.code === 'EPERM' || err.code === 'EACCES' || err.code === 'EROFS');
+
+// macOS の「ファイルとフォルダ」の許可で弾かれたときに、黙って落ちずに案内する
+async function resolveAccessProblem(err) {
+  const dir = dataDir();
+  const permission = isPermissionError(err);
+  const res = await dialog.showMessageBox({
+    type: 'warning',
+    title: 'メモのフォルダを開けません',
+    message: permission ? 'macOS にフォルダへのアクセスを止められています' : 'メモのフォルダを読み取れませんでした',
+    detail:
+      `${dir}\n\n` +
+      (permission
+        ? 'システム設定 › プライバシーとセキュリティ › ファイルとフォルダ で local-note に許可を与えてから「再試行」を押してください。\n' +
+          '許可の項目が出てこない場合は、ターミナルで次を実行してからアプリを開き直すと、許可を聞かれるようになります。\n' +
+          '  tccutil reset SystemPolicyDocumentsFolder net.trends-ai.local-note\n\n' +
+          '書類・デスクトップ・ダウンロード以外のフォルダ（例：ホーム直下）を選べば、この許可は不要になります。\n\n'
+        : '') +
+      `(${err.code || 'error'}: ${err.message})`,
+    buttons: ['再試行', 'システム設定を開く', '別のフォルダを選ぶ…', '終了'],
+    defaultId: 0,
+    cancelId: 3,
+  });
+
+  if (res.response === 1) {
+    shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_FilesAndFolders');
+    return;
+  }
+  if (res.response === 2) {
+    const picked = await dialog.showOpenDialog({
+      title: 'メモの保存先を選ぶ',
+      message: 'このフォルダの中に pages/ と files/ を作ります。',
+      buttonLabel: 'このフォルダにする',
+      properties: ['openDirectory', 'createDirectory'],
+      defaultPath: app.getPath('home'),
+    });
+    if (!picked.canceled && picked.filePaths[0]) writeSettings({ dataDir: picked.filePaths[0] });
+    return;
+  }
+  if (res.response === 3) app.exit(0);
 }
 
 function ensureDirs() {
@@ -564,6 +627,13 @@ if (!app.requestSingleInstanceLock()) {
     const firstRun = needsSetup();
     // 初期化に失敗してもウィンドウだけは必ず開く
     if (!firstRun) {
+      // 読めるようになるまで案内する（許可を与える／別のフォルダを選ぶ）
+      for (let i = 0; i < 20; i++) {
+        const err = dataDirAccessError();
+        if (!err) break;
+        console.error('[main] データフォルダを読めません:', err.code, err.message);
+        await resolveAccessProblem(err);
+      }
       try {
         ensureDirs();
         await seedIfEmpty();

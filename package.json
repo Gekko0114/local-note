@@ -37,7 +37,13 @@
           ]
         }
       ],
-      "icon": "build/icon.icns"
+      "icon": "build/icon.icns",
+      "extendInfo": {
+        "NSDocumentsFolderUsageDescription": "メモの保存先フォルダを読み書きするために使います。",
+        "NSDesktopFolderUsageDescription": "メモの保存先にデスクトップ配下を選んだ場合に、その読み書きのために使います。",
+        "NSDownloadsFolderUsageDescription": "メモの保存先にダウンロード配下を選んだ場合に、その読み書きのために使います。",
+        "NSRemovableVolumesUsageDescription": "メモの保存先に外付けドライブを選んだ場合に、その読み書きのために使います。"
+      }
     }
   }
 }

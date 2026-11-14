@@ -645,4 +645,17 @@ async function boot() {
   console.log(`local-note ready (${state.pages.length} pages)`);
 }
 
-boot().catch((err) => { document.body.innerHTML = `<pre style="padding:40px">起動に失敗しました: ${err.message}</pre>`; });
+boot().catch((err) => {
+  const raw = String(err && err.message || err);
+  const denied = /EPERM|EACCES|operation not permitted/i.test(raw);
+  document.body.innerHTML = `
+    <div style="max-width:620px;margin:14vh auto;padding:0 32px;font:14px/1.7 ui-sans-serif,-apple-system,sans-serif;color:#37352f">
+      <div style="font-size:19px;font-weight:700;margin-bottom:10px">${denied ? 'メモのフォルダを開けませんでした' : '起動できませんでした'}</div>
+      <p style="margin:0 0 14px;color:rgba(55,53,47,.72)">${denied
+        ? 'macOS がこのフォルダへのアクセスを止めています。システム設定 › プライバシーとセキュリティ › ファイルとフォルダ で local-note に許可を与えてから、再読み込みしてください。書類・デスクトップ・ダウンロード以外の場所（例：ホーム直下）を保存先にすれば、この許可は要りません。'
+        : 'メモの読み込み中にエラーが起きました。'}</p>
+      <button id="ln-reload" style="font:inherit;padding:7px 16px;border:0;border-radius:5px;background:#2383e2;color:#fff;cursor:pointer">再読み込み</button>
+      <pre style="margin-top:18px;padding:10px 12px;background:#f7f7f5;border-radius:6px;font-size:12px;white-space:pre-wrap;color:rgba(55,53,47,.6)">${raw}</pre>
+    </div>`;
+  document.getElementById('ln-reload').onclick = () => location.reload();
+});

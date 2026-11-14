@@ -78,13 +78,15 @@ The editor follows Notion's behaviour closely.
 
 One page is one Markdown file.
 
-**On first launch the app asks where to keep them.** The suggested folder is `~/Documents/local-note/`, but you can pick anywhere — inside Dropbox or iCloud Drive, inside a Git repository, wherever. If you pick a folder that already holds notes, it opens them as they are instead of creating anything (so a folder carried over from another Mac just works). If you close the window without choosing, the app quits without creating anything.
+**On first launch the app asks where to keep them.** The suggested folder is `~/local-note/`, but you can pick anywhere — inside Dropbox or iCloud Drive, inside a Git repository, wherever. If you pick a folder that already holds notes, it opens them as they are instead of creating anything (so a folder carried over from another Mac just works). If you close the window without choosing, the app quits without creating anything.
 
 ```
-~/Documents/local-note/
+~/local-note/
 ├── pages/p_xxxxxxxxxxxx.md
 └── files/              # pasted images
 ```
+
+> The default sits directly in your home folder because **Documents, Desktop and Downloads are protected by macOS**. Keeping notes in one of those means the app cannot read them until you grant it "Files and Folders" access in System Settings.
 
 ```markdown
 ---
