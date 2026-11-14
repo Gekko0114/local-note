@@ -1,85 +1,89 @@
 # local-note
 
-ローカルPCだけで動く、**Notion風のデスクトップノートアプリ**（Electron製・自分専用）。
-クラウドには一切送信せず、データは手元の Markdown ファイルとして保存されます。
+[日本語](README.ja.md) | **English**
+
+A **Notion-like desktop note app** that runs entirely on your own Mac (Electron, built for personal use).
+Nothing is ever sent to the cloud — every page is a plain Markdown file on your disk.
+
+> The app's interface is in Japanese.
 
 ```bash
-npm install     # 初回のみ
-npm start       # 起動
+npm install     # first time only
+npm start       # run it
 ```
 
-`.app` として使う場合:
+To build it as an `.app`:
 
 ```bash
 npm run pack
 ```
 
-`dist/mac-arm64/local-note.app` ができます。`/Applications` にコピーすればふつうのMacアプリとして常用できます。
+That produces `dist/mac-arm64/local-note.app`. Copy it to `/Applications` and use it like any other Mac app.
 
-## 画面と操作感
+## Editing
 
-Notion のエディタ挙動に寄せてあります。
+The editor follows Notion's behaviour closely.
 
-### ブロックエディタ
-- **`/`** でブロックメニュー。最近使ったブロックが上に出て、`/削除` `/複製` のような操作も打てます（ページ / テキスト / 見出し1〜3 / 箇条書き / 番号付き / ToDo / トグル / 引用 / コールアウト / コード / 区切り線 / テーブル / 画像 / ページへのリンク）
-- **`/page`** でその場に子ページを作成。名前をその場で入力でき、クリックすると中に入れます（サイドバーにも子として並びます）
-- ブロックの左に出る **＋**（下にブロック追加＋メニュー）と **⠿**（ドラッグで並べ替え、クリックでブロックメニュー）
-- **テキストを選択すると書式バー**が浮く（変換 / **B** / *I* / <u>U</u> / ~~S~~ / `code` / リンク）
-- **ドラッグで複数ブロックを選択** → まとめて削除・複製・コピー・インデント
-- `Esc` でブロック選択、`Shift+↑↓` で選択を拡張、`⌘A` 2回で全ブロック選択
-- **⌘Z / ⌘⇧Z** はブロックの追加・削除・並べ替えまで含めて取り消せます
-- 右クリックでブロックメニュー
+### Block editor
+- **`/`** opens the block menu. Recently used blocks come first, and action commands such as `/削除` (delete) and `/複製` (duplicate) are available too (page / text / heading 1–3 / bulleted / numbered / to-do / toggle / quote / callout / code / divider / table / image / link to page)
+- **`/page`** creates a sub-page right where you are. Type its name inline, then click it to go in (it also appears in the sidebar as a child)
+- To the left of each block: **＋** (insert a block below, with the menu) and **⠿** (drag to reorder, click for the block menu)
+- **Selecting text floats a format bar** (turn into / **B** / *I* / <u>U</u> / ~~S~~ / `code` / link)
+- **Drag across blocks to select several**, then delete, duplicate, copy or indent them together
+- `Esc` selects the block, `Shift+↑↓` extends the selection, `⌘A` twice selects every block
+- **⌘Z / ⌘⇧Z** undo and redo everything, including adding, deleting and reordering blocks
+- Right-click opens the block menu
 
-### 入力ショートカット（行頭で打つと変換）
-| 入力 | 変わるブロック |
+### Markdown shortcuts (type at the start of a line)
+| Type | Becomes |
 | --- | --- |
-| `# ` `## ` `### ` | 見出し1〜3 |
-| `- ` `* ` | 箇条書きリスト |
-| `1. ` | 番号付きリスト |
-| `[] ` | ToDo |
-| `> ` | トグルリスト |
-| `\| ` `" ` | 引用 |
-| `[]` | ToDo（スペース不要） |
-| `a. ` `i. ` | 番号付きリスト |
-| ` ``` ` | コードブロック |
-| `---` | 区切り線 |
+| `# ` `## ` `### ` | Heading 1–3 |
+| `- ` `* ` | Bulleted list |
+| `1. ` | Numbered list |
+| `[] ` | To-do |
+| `> ` | Toggle list |
+| `\| ` `" ` | Quote |
+| `[]` | To-do (no space needed) |
+| `a. ` `i. ` | Numbered list |
+| ` ``` ` | Code block |
+| `---` | Divider |
 
-### 書きながら変換されるインライン記法
-`**太字**` / `*斜体*` / `~打ち消し~`（`~~`も可） / `` `コード` `` は閉じた瞬間に書式へ変わります。
+### Inline formatting as you type
+`**bold**` / `*italic*` / `~strikethrough~` (`~~` works too) / `` `code` `` are converted the moment you close them.
 
-### サブページ
-- `/page` → 子ページが1行のブロックとして入り、そのまま名前を入力できます。クリックでそのページへ移動
-- 既存のテキストブロックは、⠿ メニューの「ページに変換」でそのままページにできます
-- ⠿ メニューから「名前を変更」「このページを開く」
-- ファイル上は `[タイトル](p_xxxxxxxxxxxx.md)` という相対リンクとして保存されるので、他のMarkdownエディタでもページを辿れます
-- ブロックを削除してもページ自体は残ります（消すときはサイドバーの ⋯ → ゴミ箱に入れる）
+### Sub-pages
+- `/page` inserts a sub-page as a one-line block and lets you name it immediately. Click it to open that page
+- An existing text block can become a page via **ページに変換** (turn into page) in the ⠿ menu
+- The ⠿ menu also has **名前を変更** (rename) and **このページを開く** (open this page)
+- On disk it is stored as a relative link, `[Title](p_xxxxxxxxxxxx.md)`, so other Markdown editors can follow it too
+- Deleting the block keeps the page itself (to remove it, use ⋯ → trash in the sidebar)
 
-### ページのリンク
-- **`[[`** または **`@`** でページ検索ポップアップ。選ぶとそのページへのリンクが入ります（なければその場で新規作成）
+### Links between pages
+- **`[[`** or **`@`** opens a page search popup. Pick a page to link to it — or create one on the spot if it does not exist yet
 
-### キーボード
-| キー | 動作 |
+### Keyboard
+| Key | Action |
 | --- | --- |
-| `⌘P` / `⌘K` | ページ検索・作成 |
-| `⌘N` | 新規ページ |
-| `⌘⇧N` | 子ページを追加 |
-| `⌘S` | 即保存（ふだんは自動保存） |
-| `⌘\` | サイドバーの表示/非表示 |
-| `⌘D` | ブロックを複製 |
-| `⌘⏎` | ToDoのチェック / トグルの開閉 |
-| `Tab` / `⇧Tab` | 階層を下げる / 上げる |
-| `⌘⇧E` | Markdownで書き出し |
+| `⌘P` / `⌘K` | Search / create a page |
+| `⌘N` | New page |
+| `⌘⇧N` | Add a sub-page |
+| `⌘S` | Save now (it autosaves anyway) |
+| `⌘\` | Show / hide the sidebar |
+| `⌘D` | Duplicate the block |
+| `⌘⏎` | Toggle a to-do / open a toggle |
+| `Tab` / `⇧Tab` | Indent / outdent |
+| `⌘⇧E` | Export as Markdown |
 
-## 保存のしかた
+## How your notes are stored
 
-ページは1ページ＝1ファイルの Markdown です。
+One page is one Markdown file.
 
-**初回起動時に保存先フォルダを聞かれます。** 既定の候補は `~/Documents/local-note/` ですが、Dropbox や iCloud Drive の下、Gitリポジトリの中など、好きな場所を選べます。既にメモの入ったフォルダを選んだ場合は、新しく作らずにそのまま開きます（別のMacから持ってきたフォルダをそのまま使えます）。選ばずにウィンドウを閉じた場合は、何も作らずに終了します。
+**On first launch the app asks where to keep them.** The suggested folder is `~/Documents/local-note/`, but you can pick anywhere — inside Dropbox or iCloud Drive, inside a Git repository, wherever. If you pick a folder that already holds notes, it opens them as they are instead of creating anything (so a folder carried over from another Mac just works). If you close the window without choosing, the app quits without creating anything.
 
 ```
 ~/Documents/local-note/
 ├── pages/p_xxxxxxxxxxxx.md
-└── files/              # 貼り付けた画像
+└── files/              # pasted images
 ```
 
 ```markdown
@@ -102,36 +106,36 @@ updated: 2026-11-12T10:30:00+09:00
   中身
 ```
 
-ふつうの Markdown なので、他のエディタで開く・`grep` する・`git` で履歴を残す、どれも自由です。
-保存先はあとから **メニュー › local-note › データフォルダを変更…** で変えられます（中身の引っ越しはFinderで行ってください）。
+It is ordinary Markdown, so you are free to open it in another editor, `grep` it, or keep its history in `git`.
+You can change the location later from **menu › local-note › データフォルダを変更…** (moving the existing files over is up to you, in Finder).
 
-## そのほか
+## Other things
 
-- サイドバーはドラッグで幅を変更、ページはドラッグ&ドロップで入れ子に移動
-- お気に入り（★）、タグ、ゴミ箱（復元つき）
-- テーマはメニュー › 表示 › ライト / ダーク / システムに合わせる
-- 画像は編集中に `⌘V` で貼り付けると `files/` に保存されます
+- Drag the sidebar edge to resize it; drag and drop pages to nest them
+- Favourites (★), tags, and a trash you can restore from
+- Theme: menu › 表示 › ライト / ダーク / システムに合わせる (light / dark / match the system)
+- Paste an image with `⌘V` while editing and it is saved into `files/`
 
-## 制限
+## Limitations
 
-- ブロックの文字色・背景色（Notionのカラー）は未対応です。Markdown で表現できないため見送っています
-- データベース／ボード／カレンダーのビューはありません。あくまでドキュメント用です
-- 同期はしません。必要なら保存先フォルダ自体を同期サービスに置いてください
+- Text and background colours for blocks (Notion's colours) are not supported — Markdown cannot express them
+- No database, board or calendar views. This is for documents only
+- No sync. If you need it, put the storage folder itself in a syncing service
 
-## 構成
+## Layout
 
 ```
 local-note/
-├── main.js            # Electron メインプロセス（ファイル保存・メニュー・ウィンドウ）
-├── preload.js         # contextBridge で渡す保存API
+├── main.js            # Electron main process (file storage, menus, window)
+├── preload.js         # the storage API exposed through contextBridge
 ├── renderer/
 │   ├── index.html
-│   ├── styles.css     # Notion準拠のデザイン
-│   ├── markdown.js    # ブロック ⇄ Markdown 変換
-│   ├── editor.js      # ブロックエディタ本体
-│   ├── app.js         # サイドバー・検索・ページ管理
-│   └── dev-mock.js    # ブラウザで見た目確認するときだけ使うモック
+│   ├── styles.css     # Notion-like design
+│   ├── markdown.js    # blocks ⇄ Markdown
+│   ├── editor.js      # the block editor itself
+│   ├── app.js         # sidebar, search, page management
+│   └── dev-mock.js    # a mock used only when checking the UI in a browser
 └── package.json
 ```
 
-セキュリティ設定は `contextIsolation: true` / `nodeIntegration: false` / CSP あり。ネットワークへ出るコードはありません。
+Security settings: `contextIsolation: true`, `nodeIntegration: false`, CSP enabled. No code in this app reaches the network.
