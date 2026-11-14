@@ -2,6 +2,7 @@
 <body><canvas id="c" width="1024" height="1024"></canvas>
 <script>
 const FONT = 'file:///Applications/iMovie.app/Contents/Frameworks/Flexo.framework/Versions/A/Resources/Fonts/OldEnglishText-Regular.ttf';
+const LETTER = 'N';
 const S = 1024, ctx = document.getElementById('c').getContext('2d');
 
 function roundRect(x, y, w, h, r) {
@@ -11,33 +12,37 @@ function roundRect(x, y, w, h, r) {
 }
 
 (async () => {
+  // ?small … 16〜32px用（字を大きく・装飾なし） / ?mark … タイル無し・透過
   const small = location.search.includes('small');
   const markOnly = location.search.includes('mark');
   const f = new FontFace('OldEng', `url("${FONT}")`);
   await f.load(); document.fonts.add(f); await document.fonts.ready;
 
-  // ---- 背景（macOS風の角丸タイル）----
+  // ---- 背景（白のタイル）----
   const M = markOnly ? 40 : 100, B = S - M * 2, R = 185;
-  const g = ctx.createLinearGradient(M, M, M, M + B);
-  if (small) { g.addColorStop(0, '#111111'); g.addColorStop(1, '#000000'); }
-  else { g.addColorStop(0, '#272727'); g.addColorStop(0.5, '#101010'); g.addColorStop(1, '#000000'); }
-  if (!markOnly) { roundRect(M, M, B, B, R); ctx.fillStyle = g; ctx.fill(); }
-  if (!small && !markOnly) {
-    roundRect(M + 2.5, M + 2.5, B - 5, B - 5, R - 2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 4; ctx.stroke();
+  if (!markOnly) {
+    const g = ctx.createLinearGradient(M, M, M, M + B);
+    if (small) { g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#f2f1ee'); }
+    else { g.addColorStop(0, '#ffffff'); g.addColorStop(0.55, '#faf9f7'); g.addColorStop(1, '#eceae5'); }
+    roundRect(M, M, B, B, R); ctx.fillStyle = g; ctx.fill();
+    if (!small) {
+      // 白背景の上でも輪郭が消えないように、ごく薄い縁をつける
+      roundRect(M + 2.5, M + 2.5, B - 5, B - 5, R - 2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.13)'; ctx.lineWidth = 4; ctx.stroke();
+    }
   }
 
-  // ---- L を実寸で測って、タイルの中心に合わせる ----
-  const FS = markOnly ? 820 : (small ? 700 : 560);
+  // ---- 文字を実寸で測って中心に置く ----
+  const FS = markOnly ? 760 : (small ? 600 : 465);
   ctx.font = `${FS}px OldEng`;
   ctx.textBaseline = 'alphabetic';
-  const m = ctx.measureText('L');
+  const m = ctx.measureText(LETTER);
   const left = -m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight;
   const top = -m.actualBoundingBoxAscent, bottom = m.actualBoundingBoxDescent;
   const w = right - left, h = bottom - top;
   const cx = M + B / 2, cy = M + B / 2;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('L', cx - (left + w / 2), cy - (top + h / 2) - 6);
-  console.log('glyph box', JSON.stringify({ w: Math.round(w), h: Math.round(h) }));
+  ctx.fillStyle = '#0b0b0b';
+  // 左側の細い飾りの分、見た目の重心が右へ寄るので少し左に寄せる
+  ctx.fillText(LETTER, cx - (left + w / 2) - FS * 0.055, cy - (top + h / 2));
 })();
 </script></body></html>
