@@ -1,8 +1,9 @@
 <!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}canvas{display:block}</style></head>
 <body><canvas id="c" width="1024" height="1024"></canvas>
 <script>
+// Death Note の L と同じ系統の書体（iMovie 同梱の Old English Text）で L を描く
 const FONT = 'file:///Applications/iMovie.app/Contents/Frameworks/Flexo.framework/Versions/A/Resources/Fonts/OldEnglishText-Regular.ttf';
-const LETTER = 'N';
+const LETTER = 'L';
 const S = 1024, ctx = document.getElementById('c').getContext('2d');
 
 function roundRect(x, y, w, h, r) {
@@ -12,14 +13,13 @@ function roundRect(x, y, w, h, r) {
 }
 
 (async () => {
-  // ?small … 16〜32px用（字を大きく・装飾なし） / ?mark … タイル無し・透過
+  // ?small … 16〜32px用（字を大きく・内側の縁なし） / ?mark … タイル無し・透過
   const small = location.search.includes('small');
   const markOnly = location.search.includes('mark');
   const f = new FontFace('OldEng', `url("${FONT}")`);
   await f.load(); document.fonts.add(f); await document.fonts.ready;
 
-  // ---- 背景（白のタイル）----
-  const M = markOnly ? 40 : 100, B = S - M * 2, R = 185;
+  const M = markOnly ? 60 : 100, B = S - M * 2, R = 185;
   if (!markOnly) {
     const g = ctx.createLinearGradient(M, M, M, M + B);
     if (small) { g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#f2f1ee'); }
@@ -32,17 +32,16 @@ function roundRect(x, y, w, h, r) {
     }
   }
 
-  // ---- 文字を実寸で測って中心に置く ----
-  const FS = markOnly ? 760 : (small ? 600 : 465);
+  // 字を実寸で測って中心に置く
+  const FS = markOnly ? 760 : (small ? 620 : 540);
   ctx.font = `${FS}px OldEng`;
   ctx.textBaseline = 'alphabetic';
   const m = ctx.measureText(LETTER);
   const left = -m.actualBoundingBoxLeft, right = m.actualBoundingBoxRight;
   const top = -m.actualBoundingBoxAscent, bottom = m.actualBoundingBoxDescent;
   const w = right - left, h = bottom - top;
-  const cx = M + B / 2, cy = M + B / 2;
+  const cx = S / 2, cy = S / 2;
   ctx.fillStyle = '#0b0b0b';
-  // 左側の細い飾りの分、見た目の重心が右へ寄るので少し左に寄せる
-  ctx.fillText(LETTER, cx - (left + w / 2) - FS * 0.055, cy - (top + h / 2));
+  ctx.fillText(LETTER, cx - (left + w / 2), cy - (top + h / 2));
 })();
 </script></body></html>
