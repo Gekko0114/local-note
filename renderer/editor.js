@@ -1,4 +1,4 @@
-/* Notion に寄せたブロックエディタ */
+/* ブロックエディタ本体 */
 'use strict';
 
 window.Editor = (() => {
@@ -55,7 +55,7 @@ window.Editor = (() => {
 
   const root = () => document.getElementById('blocks');
 
-  // 空のページでは最初の行にプレースホルダを出す（Notionと同じ）
+  // 空のページでは最初の行にプレースホルダを出す
   function updateEmptyState() {
     const r = root();
     if (!r || !blocks.length) return;
@@ -570,7 +570,7 @@ window.Editor = (() => {
     [/^#\s$/, 'h1'], [/^##\s$/, 'h2'], [/^###\s$/, 'h3'],
     [/^[-*+]\s$/, 'bullet'],
     [/^(1|a|i)[.)]\s$/, 'numbered'],
-    [/^\[\]$/, 'todo'], [/^\[\s\]$/, 'todo'],              // Notionは [] だけでスペース不要
+    [/^\[\]$/, 'todo'], [/^\[\s\]$/, 'todo'],              // [] だけでよく、スペースは不要
     [/^\[x\]$/i, 'todo', { checked: true }],
     [/^>\s$/, 'toggle'], [/^\|\s$/, 'quote'], [/^"\s$/, 'quote'],
     [/^```$/, 'code'], [/^---$/, 'divider'],

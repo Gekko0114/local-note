@@ -1,4 +1,4 @@
-/* local-note — Notion に寄せたデザイン */
+/* local-note — 画面まわりのデザイン */
 
 :root {
   --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", Helvetica, "Apple Color Emoji", Arial, sans-serif;
@@ -399,7 +399,7 @@ table.nt tr:first-child td { background: var(--table-head); font-weight: 500; }
   .ctl { left: -40px; }
 }
 
-/* プレースホルダはフォーカス中の段落だけに出す（Notionと同じ挙動） */
+/* プレースホルダはフォーカス中の段落だけに出す */
 .block[data-type="p"] .text:empty::before { content: ""; }
 .block[data-type="p"].focus .text:empty::before { content: attr(data-placeholder); }
 .block[data-type="code"] .text:empty::before { content: ""; }

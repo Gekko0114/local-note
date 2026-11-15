@@ -2,7 +2,7 @@
   "name": "local-note",
   "productName": "local-note",
   "version": "1.0.0",
-  "description": "ローカルPCだけで動く、Notion風のデスクトップノートアプリ",
+  "description": "ローカルPCだけで動く、ブロック式のデスクトップノートアプリ",
   "main": "main.js",
   "private": true,
   "license": "MIT",

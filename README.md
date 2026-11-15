@@ -2,7 +2,7 @@
 
 [日本語](README.ja.md) | **English**
 
-A **Notion-like desktop note app** that runs entirely on your own Mac (Electron, built for personal use).
+A **block-based desktop note app** that runs entirely on your own Mac (Electron, built for personal use).
 Nothing is ever sent to the cloud — every page is a plain Markdown file on your disk.
 
 > The app's interface is in Japanese.
@@ -58,7 +58,7 @@ Notarization needs a paid Apple Developer account. Without one, `npm run pack` s
 
 ## Editing
 
-The editor follows Notion's behaviour closely.
+The editor follows the conventions of modern block editors.
 
 ### Block editor
 - **`/`** opens the block menu. Recently used blocks come first, and action commands such as `/削除` (delete) and `/複製` (duplicate) are available too (page / text / heading 1–3 / bulleted / numbered / to-do / toggle / quote / callout / code / divider / table / image / link to page)
@@ -156,7 +156,7 @@ You can change the location later from **menu › local-note › データフォ
 
 ## Limitations
 
-- Text and background colours for blocks (Notion's colours) are not supported — Markdown cannot express them
+- Text and background colours for blocks are not supported — Markdown cannot express them
 - No database, board or calendar views. This is for documents only
 - No sync. If you need it, put the storage folder itself in a syncing service
 
@@ -168,7 +168,7 @@ local-note/
 ├── preload.js         # the storage API exposed through contextBridge
 ├── renderer/
 │   ├── index.html
-│   ├── styles.css     # Notion-like design
+│   ├── styles.css     # Styling
 │   ├── markdown.js    # blocks ⇄ Markdown
 │   ├── editor.js      # the block editor itself
 │   ├── app.js         # sidebar, search, page management
