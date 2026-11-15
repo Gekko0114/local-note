@@ -26,6 +26,20 @@ CSC_NAME="あなたの名前 (TEAMID)" npm run pack
 
 アイコンを焼き直すときは `npm run icon`（詳しくは `build/icon-source/README.md`）。
 
+### 配布用（公証済み dmg）
+
+ネット経由で配ったアプリは、Apple の公証（notarization）を通していないと macOS が開いてくれません（「壊れているため開けません」と出ます）。人に渡すビルドはリリーススクリプトを使ってください。アプリの署名→公証→dmg 化→dmg の公証→両方のステープルまでやります。
+
+```bash
+cp scripts/release.env.example scripts/release.env   # 自分の値に書き換える
+security add-generic-password -a "<Apple ID>" -s local-note -w   # アプリ用パスワード
+scripts/release-mac.sh
+```
+
+`dist/local-note-<版>-arm64.dmg` ができ、他の Mac でも警告なしで開けます。`scripts/release.env` は git 管理外、アプリ用パスワードはキーチェーンの中なので、どちらもリポジトリには入りません。
+
+公証には有料の Apple Developer アカウントが必要です。無くても `npm run pack` で自分の Mac 用のアプリは普通に作れます。
+
 ## 画面と操作感
 
 Notion のエディタ挙動に寄せてあります。
@@ -143,6 +157,8 @@ local-note/
 │   ├── editor.js      # ブロックエディタ本体
 │   ├── app.js         # サイドバー・検索・ページ管理
 │   └── dev-mock.js    # ブラウザで見た目確認するときだけ使うモック
+├── scripts/
+│   └── release-mac.sh # 配布用 dmg の署名・公証
 └── package.json
 ```
 

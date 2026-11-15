@@ -2,3 +2,4 @@ node_modules/
 dist/
 data/
 build/icon.iconset/
+scripts/release.env
