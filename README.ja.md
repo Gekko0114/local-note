@@ -5,6 +5,10 @@
 ローカルPCだけで動く、**ブロック式のデスクトップノートアプリ**（Electron製・自分専用）。
 クラウドには一切送信せず、データは手元の Markdown ファイルとして保存されます。
 
+![local-note のデモ](promo/local-note-demo.gif)
+
+> ナレーション入りの動画は [`promo/local-note-promo-narrated.mp4`](promo/local-note-promo-narrated.mp4) にあります。
+
 ```bash
 npm install     # 初回のみ
 npm start       # 起動

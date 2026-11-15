@@ -5,6 +5,10 @@
 A **block-based desktop note app** that runs entirely on your own Mac (Electron, built for personal use).
 Nothing is ever sent to the cloud — every page is a plain Markdown file on your disk.
 
+![local-note demo](promo/local-note-demo.gif)
+
+> A narrated version of this clip is at [`promo/local-note-promo-narrated.mp4`](promo/local-note-promo-narrated.mp4).
+
 > The app's interface is in Japanese.
 
 ```bash
