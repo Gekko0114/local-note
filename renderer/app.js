@@ -2,7 +2,7 @@
 'use strict';
 
 const $ = (s) => document.querySelector(s);
-const store = window.api;  // contextBridge で渡された保存API
+let store;  // contextBridge で渡された保存API（boot で入れる）
 
 /* ============================ 小さなUI部品 ============================ */
 window.UI = (() => {
@@ -568,6 +568,11 @@ async function setPageIcon(emoji) {
 }
 
 async function boot() {
+  // ブラウザで開いたときだけ、見た目確認用のモックを読む。
+  // 配布物に dev-mock.js は入らない（Electron では preload が window.api を用意する）。
+  if (!window.api) await import('./dev-mock.js');
+  store = window.api;
+
   const w = localStorage.getItem('ln.sidebarW');
   if (w) document.documentElement.style.setProperty('--sidebar-w', w + 'px');
 

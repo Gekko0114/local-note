@@ -10,7 +10,8 @@
 #       security add-generic-password -a <Apple ID> -s <KEYCHAIN_SERVICE> -w
 #   - scripts/release.env に自分の値を書く（git には入らない。release.env.example を参照）
 #
-# 出力: dist/local-note-<版>-arm64.dmg
+# 出力: dist/local-note-<版>-arm64.dmg（Apple シリコン）
+#       dist/local-note-<版>.dmg（Intel）
 #       （中の .app も dmg も署名・公証・ステープル済み）
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -37,24 +38,33 @@ export CSC_NAME APPLE_ID APPLE_TEAM_ID APPLE_APP_SPECIFIC_PASSWORD
 
 echo "==> build + sign + notarize .app, then dmg"
 rm -f dist/*.dmg
-./node_modules/.bin/electron-builder --mac --arm64
+./node_modules/.bin/electron-builder --mac
 
-APP="dist/mac-arm64/local-note.app"
-DMG="$(ls -t dist/*.dmg | head -1)"
-[ -d "$APP" ] || { echo "missing $APP" >&2; exit 1; }
-[ -f "$DMG" ] || { echo "dmg が作られていません" >&2; exit 1; }
+# 署名・公証された .app を確認する（アーキごとに出力先が違う）。
+found=0
+for app in dist/mac-arm64/local-note.app dist/mac/local-note.app; do
+  [ -d "$app" ] || continue
+  found=1
+  echo "==> verify $app"
+  codesign --verify --deep --strict "$app"
+  xcrun stapler validate "$app"
+  spctl --assess --type execute --verbose "$app"
+done
+[ "$found" = 1 ] || { echo "署名された .app が見つかりません" >&2; exit 1; }
 
-echo "==> verify .app"
-codesign --verify --deep --strict "$APP"
-xcrun stapler validate "$APP"
-spctl --assess --type execute --verbose "$APP"
+shopt -s nullglob
+dmgs=(dist/*.dmg)
+[ "${#dmgs[@]}" -gt 0 ] || { echo "dmg が作られていません" >&2; exit 1; }
 
 # dmg 自体も署名・公証しておくと、開いた時点で Gatekeeper の確認が済む。
-echo "==> sign + notarize dmg: $(basename "$DMG")"
-codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG"
-xcrun notarytool submit "$DMG" \
-  --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --wait
-xcrun stapler staple "$DMG"
-spctl --assess --type open --context context:primary-signature --verbose "$DMG"
+for dmg in "${dmgs[@]}"; do
+  echo "==> sign + notarize dmg: $(basename "$dmg")"
+  codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$dmg"
+  xcrun notarytool submit "$dmg" \
+    --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --wait
+  xcrun stapler staple "$dmg"
+  spctl --assess --type open --context context:primary-signature --verbose "$dmg"
+done
 
-echo "==> done: $DMG"
+echo "==> done:"
+for dmg in "${dmgs[@]}"; do echo "    $dmg"; done

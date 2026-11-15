@@ -28,6 +28,19 @@ CSC_NAME="Your Name (TEAMID)" npm run pack
 
 To re-bake the icon, run `npm run icon` (see `build/icon-source/README.md`).
 
+### Tests
+
+```bash
+npm test     # blocks ⇄ Markdown round-trip and URL-sanitising tests
+npm run check  # syntax-check every source file
+```
+
+Both run on every push and pull request (`.github/workflows/ci.yml`).
+
+To check the UI in a plain browser, serve the `renderer` folder (for example
+`python3 -m http.server -d renderer`) and open it. `dev-mock.js` then stands in for the
+file-storage API, keeping pages in `localStorage`. It is excluded from packaged builds.
+
 ### Releasing a notarized `.dmg`
 
 macOS will not open an app downloaded from the web unless Apple has notarized it — it just says the app is damaged. For a build you intend to hand to someone else, use the release script. It signs the app, notarizes it, wraps it in a `.dmg`, notarizes that as well, and staples both tickets:
@@ -38,7 +51,8 @@ security add-generic-password -a "<your Apple ID>" -s local-note -w   # app-spec
 scripts/release-mac.sh
 ```
 
-The result is `dist/local-note-<version>-arm64.dmg`, which opens on another Mac with no Gatekeeper warning. `scripts/release.env` is git-ignored and the app-specific password stays in your keychain, so neither ever enters the repository.
+The result is `dist/local-note-<version>-arm64.dmg` (Apple silicon) and
+`dist/local-note-<version>.dmg` (Intel), which open on another Mac with no Gatekeeper warning. `scripts/release.env` is git-ignored and the app-specific password stays in your keychain, so neither ever enters the repository.
 
 Notarization needs a paid Apple Developer account. Without one, `npm run pack` still gives you a perfectly usable app on your own machine.
 
@@ -158,7 +172,9 @@ local-note/
 │   ├── markdown.js    # blocks ⇄ Markdown
 │   ├── editor.js      # the block editor itself
 │   ├── app.js         # sidebar, search, page management
-│   └── dev-mock.js    # a mock used only when checking the UI in a browser
+│   └── dev-mock.js    # a mock used only when checking the UI in a browser (not shipped)
+├── test/
+│   └── markdown.test.mjs  # blocks ⇄ Markdown regression tests
 ├── scripts/
 │   └── release-mac.sh # signs + notarizes a distributable dmg
 └── package.json

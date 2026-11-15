@@ -26,6 +26,19 @@ CSC_NAME="あなたの名前 (TEAMID)" npm run pack
 
 アイコンを焼き直すときは `npm run icon`（詳しくは `build/icon-source/README.md`）。
 
+### テスト
+
+```bash
+npm test       # ブロック ⇄ Markdown の往復と、URLの無害化
+npm run check  # 全ソースの構文チェック
+```
+
+push と pull request で自動実行されます（`.github/workflows/ci.yml`）。
+
+ブラウザで見た目だけ確認したいときは、`renderer` を配信して開いてください
+（例: `python3 -m http.server -d renderer`）。`dev-mock.js` が保存APIの代わりに入り、
+ページは localStorage に持ちます。配布物には含まれません。
+
 ### 配布用（公証済み dmg）
 
 ネット経由で配ったアプリは、Apple の公証（notarization）を通していないと macOS が開いてくれません（「壊れているため開けません」と出ます）。人に渡すビルドはリリーススクリプトを使ってください。アプリの署名→公証→dmg 化→dmg の公証→両方のステープルまでやります。
@@ -36,7 +49,8 @@ security add-generic-password -a "<Apple ID>" -s local-note -w   # アプリ用�
 scripts/release-mac.sh
 ```
 
-`dist/local-note-<版>-arm64.dmg` ができ、他の Mac でも警告なしで開けます。`scripts/release.env` は git 管理外、アプリ用パスワードはキーチェーンの中なので、どちらもリポジトリには入りません。
+`dist/local-note-<版>-arm64.dmg`（Apple シリコン）と `dist/local-note-<版>.dmg`（Intel）ができ、
+他の Mac でも警告なしで開けます。`scripts/release.env` は git 管理外、アプリ用パスワードはキーチェーンの中なので、どちらもリポジトリには入りません。
 
 公証には有料の Apple Developer アカウントが必要です。無くても `npm run pack` で自分の Mac 用のアプリは普通に作れます。
 
@@ -156,7 +170,9 @@ local-note/
 │   ├── markdown.js    # ブロック ⇄ Markdown 変換
 │   ├── editor.js      # ブロックエディタ本体
 │   ├── app.js         # サイドバー・検索・ページ管理
-│   └── dev-mock.js    # ブラウザで見た目確認するときだけ使うモック
+│   └── dev-mock.js    # ブラウザで見た目確認するときだけ使うモック（配布物には入らない）
+├── test/
+│   └── markdown.test.mjs  # ブロック ⇄ Markdown の回帰テスト
 ├── scripts/
 │   └── release-mac.sh # 配布用 dmg の署名・公証
 └── package.json

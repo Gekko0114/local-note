@@ -22,7 +22,9 @@
     "start": "electron .",
     "pack": "electron-builder --dir --arm64",
     "dist": "electron-builder",
-    "icon": "node build/icon-source/make-icon.mjs"
+    "icon": "node build/icon-source/make-icon.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "for f in main.js preload.js renderer/*.js; do node --check \"$f\" || exit 1; done"
   },
   "devDependencies": {
     "electron": "^45.3.2",

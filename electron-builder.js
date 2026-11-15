@@ -17,10 +17,11 @@ module.exports = {
   appId: 'net.trends-ai.local-note',
   productName: 'local-note',
   directories: { output: 'dist' },
-  files: ['main.js', 'preload.js', 'renderer/**/*', 'package.json'],
+  // dev-mock.js はブラウザで見た目を確認するためだけのものなので配布物には入れない。
+  files: ['main.js', 'preload.js', 'renderer/**/*', '!renderer/dev-mock.js', 'package.json'],
   mac: {
     category: 'public.app-category.productivity',
-    target: [{ target: 'dmg', arch: ['arm64'] }],
+    target: [{ target: 'dmg', arch: ['arm64', 'x64'] }],
     icon: 'build/icon.icns',
     identity: process.env.CSC_NAME || null,
     hardenedRuntime: true,
